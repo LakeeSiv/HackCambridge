@@ -9,10 +9,10 @@ from dash.dependencies import Input, Output, State
 
 app = dash.Dash(__name__)
 server = app.server
-app.title = "Test"
+app.title = "Blood Alcohol Level"
 
 test_df = pd.read_excel("testdata.xlsx")
-print(test_df.to_dict("records"))
+# print(test_df.to_dict("records"))
 
 
 time = [f"{i}:00" for i in range(12)]
@@ -20,52 +20,79 @@ z = [i**2 for i in range(12)]
 
 app.layout = html.Div(
     [
-        html.H1("Blood Alcohol Predictor"),
+        html.Div([
+            html.H1("Blood Alcohol Predictor"),
 
-        html.Label("Select your sex", style={"margin": "5px"}),
-        html.Br(),
+            html.Label("Select your sex", style={"margin": "5px"}),
+            html.Br(),
 
-        dcc.Dropdown(
-            id="sex", options=[
-                {
-                    "label": "Male", "value": "Male"}, {
-                    "label": "Female", "value": "Female"},
+            dcc.Dropdown(
+                id="sex", options=[
+                    {
+                        "label": "Male", "value": "Male"}, {
+                        "label": "Female", "value": "Female"},
 
-            ], multi=False, value="ALL", style={
-                "background": "black"}),
-        html.Br(),
-        html.Label("Select your age", style={"margin": "5px"}, id="AGE"),
-        dcc.Slider(
-            id="age",
-            min=18,
-            max=60,
-            step=1,
-            value=18,
-            marks={2 * i: str(2 * i) for i in range(36)},
+                ], multi=False, value="ALL", style={
+                    "background": "black"}),
+            html.Br(),
+            html.Label("Select your age", style={"margin": "5px"}, id="AGE"),
+            dcc.Slider(
+                id="age",
+                min=18,
+                max=60,
+                step=1,
+                value=18,
+                marks={2 * i: str(2 * i) for i in range(36)},
 
 
-        ),
+            ),
 
-        html.Br(),
-        html.Label("Height", style={"margin": "5px"}, id="HEIGHT"),
-        dcc.Slider(
-            id="height",
-            min=140,
-            max=230,
-            step=1,
-            value=170,
-            marks={10 * i: str(10 * i) for i in range(24)},
-        ),
-        html.Br(),
-        html.Label("Weight", style={"margin": "5px"}, id="WEIGHT"),
-        dcc.Slider(
-            id="weight",
-            min=20,
-            max=200,
-            step=1,
-            value=70,
-            marks={10 * i: str(10 * i) for i in range(21)},
-        ),
+            html.Br(),
+            html.Label("Height", style={"margin": "5px"}, id="HEIGHT"),
+            dcc.Slider(
+                id="height",
+                min=140,
+                max=230,
+                step=1,
+                value=170,
+                marks={10 * i: str(10 * i) for i in range(24)},
+            ),
+            html.Br(),
+            html.Label("Weight", style={"margin": "5px"}, id="WEIGHT"),
+            dcc.Slider(
+                id="weight",
+                min=20,
+                max=200,
+                step=1,
+                value=70,
+                marks={10 * i: str(10 * i) for i in range(21)},
+            ),
+        ], id="container"),
+
+        html.Div([
+
+            html.Div(
+                dcc.Input(
+                    id="drink_name",
+                    placeholder="Enter Drink"
+                ), style={'width': '32%', 'display': 'inline-block'}),
+
+            html.Div(
+                dcc.Input(
+                    id="volume",
+                    placeholder="Enter Enter Volume (mL)"
+                ), style={'width': '32%', 'display': 'inline-block'}),
+            html.Div(
+                dcc.Input(
+                    id="time",
+                    placeholder="Enter Time"
+                ),
+                style={'width': '32%', 'display': 'inline-block'}),
+
+
+
+        ]),
+
         html.Br(),
         dcc.Input(
             id='adding-rows-name',
@@ -136,20 +163,9 @@ app.layout = html.Div(
 
 
 
+    ], id="data",
 
-
-
-
-
-
-
-
-
-
-
-
-
-    ], id="container",)
+)
 
 
 @app.callback(
