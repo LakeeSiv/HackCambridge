@@ -2,13 +2,18 @@ import pandas as pd
 import plotly.graph_objects as go
 from math import floor
 import dash
+import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 app = dash.Dash(__name__)
 server = app.server
 app.title = "Test"
+
+test_df = pd.read_excel("testdata.xlsx")
+print(test_df.to_dict("records"))
+
 
 time = [f"{i}:00" for i in range(12)]
 z = [i**2 for i in range(12)]
@@ -61,6 +66,61 @@ app.layout = html.Div(
             value=70,
             marks={10 * i: str(10 * i) for i in range(21)},
         ),
+        html.Br(),
+        dcc.Input(
+            id='adding-rows-name',
+            placeholder='Enter a column name...',
+            value='',
+            style={'padding': 10}
+        ),
+        html.Button('Add Column', id='adding-rows-button', n_clicks=0),
+        html.Br(),
+        dash_table.DataTable(
+            id='adding-rows-table',
+            columns=[
+
+                {
+                    'name': "Drink",
+                    'id': "Drink",
+                    'deletable': False,
+                    'renamable': False
+                },
+
+                {
+                    'name': "Volume (mL)",
+                    'id': "Volume (mL)",
+                    'deletable': False,
+                    'renamable': False
+                },
+                {
+                    'name': "Time",
+                    'id': "Time",
+                    'deletable': False,
+                    'renamable': False
+                }
+
+
+
+            ],
+            data=test_df.to_dict("records"),
+
+            editable=False,
+            row_deletable=True,
+            style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+            style_cell={'textAlign': 'left',
+                        'backgroundColor': 'rgb(50, 50, 50)',
+                        'color': 'white'},
+            style_cell_conditional=[
+                {
+                    'if': {'column_id': 'Region'},
+                    'textAlign': 'left'
+                }]
+
+
+
+        ),
+
+        html.Button('Add Row', id='editing-rows-button', n_clicks=0),
 
 
 
@@ -90,6 +150,17 @@ app.layout = html.Div(
 
 
     ], id="container",)
+
+
+@app.callback(
+    Output('adding-rows-table', 'data'),
+    Input('editing-rows-button', 'n_clicks'),
+    State('adding-rows-table', 'data'),
+    State('adding-rows-table', 'columns'))
+def add_row(n_clicks, rows, columns):
+    if n_clicks > 0:
+        rows.append({c['id']: '' for c in columns})
+    return rows
 
 
 @app.callback(
