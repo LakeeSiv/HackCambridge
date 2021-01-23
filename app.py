@@ -52,7 +52,11 @@ app.layout = html.Div(
             marks={10 * i: str(10 * i) for i in range(24)},
         ),
         dcc.Graph(
-            id="graph", figure={}, ),
+            id="graph", figure={
+                    
+            },
+            
+            ),
 
 
 
@@ -95,10 +99,19 @@ def update(age, height):
     figure = go.Figure(data = go.Scatter(
         x = time,
         y=z,
+        
+    ))
+
+    figure.update_traces(line_color="white",textfont_color = "white" ,selector=dict(type='scatter'),marker_colorbar_tickcolor = "white"
     )
 
+    figure.update_xaxes(showgrid=False, zeroline = False, tickcolor='white')
+    figure.update_yaxes(showgrid=False, zeroline = False, tickcolor='white')
+    figure.update_layout(
+        plot_bgcolor = "#1f1f1f",
+        paper_bgcolor="#2c2c2c",
+        
     )
-    figure.update()
 
 
 
