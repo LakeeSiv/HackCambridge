@@ -11,7 +11,7 @@ server = app.server
 app.title = "Test"
 
 time = [f"{i}:00" for i in range(12)]
-z= [i**2 for i in range(12)]
+z = [i**2 for i in range(12)]
 
 app.layout = html.Div(
     [
@@ -37,7 +37,7 @@ app.layout = html.Div(
             step=1,
             value=18,
             marks={2 * i: str(2 * i) for i in range(36)},
-            
+
 
         ),
 
@@ -51,12 +51,28 @@ app.layout = html.Div(
             value=170,
             marks={10 * i: str(10 * i) for i in range(24)},
         ),
+        html.Br(),
+        html.Label("Weight", style={"margin": "5px"}, id="WEIGHT"),
+        dcc.Slider(
+            id="weight",
+            min=20,
+            max=200,
+            step=1,
+            value=70,
+            marks={10 * i: str(10 * i) for i in range(21)},
+        ),
+
+
+
+
+
+
         dcc.Graph(
             id="graph", figure={
-                    
+
             },
-            
-            ),
+
+        ),
 
 
 
@@ -79,13 +95,19 @@ app.layout = html.Div(
 @app.callback(
     [Output(component_id="AGE", component_property="children"),
      Output(component_id="HEIGHT", component_property="children"),
+     Output(component_id="WEIGHT", component_property="children"),
      Output(component_id="graph", component_property="figure")
-     
+
      ],
     [Input(component_id="age", component_property="value"),
-     Input(component_id="height", component_property="value")])
+     Input(component_id="height", component_property="value"),
+     Input(component_id="weight", component_property="value"),
 
-def update(age, height):
+
+     ]
+
+)
+def update(age, height, weight):
     age_txt = f"Age selected: {age} years"
 
     ft = 0.0328 * height
@@ -94,38 +116,30 @@ def update(age, height):
     height_ft_inch = f"{floor(ft)}ft {round(float(number_dec)*12,1)}in"
 
     height_txt = f"Height selected: {height} cm == {height_ft_inch}"
+    weight_txt = f"Weight: {weight}kg"
 
-
-    figure = go.Figure(data = go.Scatter(
-        x = time,
+    figure = go.Figure(data=go.Scatter(
+        x=time,
         y=z,
-        
+
     ))
 
-    figure.update_traces(line_color="white",textfont_color = "white" ,selector=dict(type='scatter'),marker_colorbar_tickcolor = "white"
-    )
+    figure.update_traces(line_color="white", textfont_color="white", selector=dict(type='scatter'), marker_colorbar_tickcolor="white"
+                         )
 
-    figure.update_xaxes(showgrid=False, zeroline = False, tickcolor='white')
-    figure.update_yaxes(showgrid=False, zeroline = False, tickcolor='white')
+    figure.update_xaxes(showgrid=False, zeroline=False, tickcolor='white',
+                        tickfont=dict(color='white'))
+
+    figure.update_yaxes(showgrid=False, zeroline=False, tickcolor='white',
+                        tickfont=dict(color='white'))
+
     figure.update_layout(
-        plot_bgcolor = "#1f1f1f",
+        plot_bgcolor="#1f1f1f",
         paper_bgcolor="#2c2c2c",
-        
+
     )
 
-
-
-
-
-
-
-    return age_txt, height_txt, figure
-
-
-
-
-
-
+    return age_txt, height_txt, weight_txt, figure
 
 
 if __name__ == "__main__":
