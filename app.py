@@ -10,6 +10,8 @@ app = dash.Dash(__name__)
 server = app.server
 app.title = "Test"
 
+time = [f"{i}:00" for i in range(12)]
+z= [i**2 for i in range(12)]
 
 app.layout = html.Div(
     [
@@ -49,6 +51,8 @@ app.layout = html.Div(
             value=170,
             marks={10 * i: str(10 * i) for i in range(24)},
         ),
+        dcc.Graph(
+            id="graph", figure={}, ),
 
 
 
@@ -70,12 +74,14 @@ app.layout = html.Div(
 
 @app.callback(
     [Output(component_id="AGE", component_property="children"),
-     Output(component_id="HEIGHT", component_property="children")
+     Output(component_id="HEIGHT", component_property="children"),
+     Output(component_id="graph", component_property="figure")
+     
      ],
     [Input(component_id="age", component_property="value"),
      Input(component_id="height", component_property="value")])
 
-def update_txt(age, height):
+def update(age, height):
     age_txt = f"Age selected: {age} years"
 
     ft = 0.0328 * height
@@ -85,7 +91,28 @@ def update_txt(age, height):
 
     height_txt = f"Height selected: {height} cm == {height_ft_inch}"
 
-    return age_txt, height_txt
+
+    figure = go.Figure(data = go.Scatter(
+        x = time,
+        y=z,
+    )
+
+    )
+    figure.update()
+
+
+
+
+
+
+
+    return age_txt, height_txt, figure
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
