@@ -13,6 +13,17 @@ app.title = "Blood Alcohol Level"
 
 test_df = pd.read_excel("testdata.xlsx")
 
+alcohol_dictionary = {"Cider": 6, "Beer": 6, "Lager": 4, "Red Wine": 12.5, "White Wine": 11, "Vodka": 40, "Whiskey": 40, "Rum": 40}
+alc_labels = []
+
+for key, val in alcohol_dictionary.items():
+    tempd = {}
+    tempd["label"] = key 
+    tempd["value"] = key 
+    alc_labels.append(tempd)
+
+
+
 
 time = [f"{i}:00" for i in range(12)]
 z = [i**2 for i in range(12)]
@@ -35,52 +46,81 @@ app.layout = html.Div(
                     "background": "black"}),
             html.Br(),
             html.Label("Select your age", style={"margin": "5px"}, id="AGE"),
-            dcc.Slider(
-                id="age",
-                min=18,
-                max=60,
-                step=1,
-                value=18,
-                marks={2 * i: str(2 * i) for i in range(36)},
+            # dcc.Slider(
+            #     id="age",
+            #     min=18,
+            #     max=60,
+            #     step=1,
+            #     value=18,
+            #     marks={2 * i: str(2 * i) for i in range(36)},
 
 
+            # ),
+            html.Br(),
+            dcc.Input(
+                id = "age",
+                type = "number",
+                min = 0,
+                max = 100,
+                value = 18,
             ),
 
+
+
+            html.Br(),
             html.Br(),
             html.Label("Height", style={"margin": "5px"}, id="HEIGHT"),
-            dcc.Slider(
+            html.Br(),
+            
+            dcc.Input(
                 id="height",
-                min=140,
+                type = "number",
+                min=0,
                 max=230,
-                step=1,
+                # step=1,
                 value=170,
-                marks={10 * i: str(10 * i) for i in range(24)},
+        
             ),
             html.Br(),
+            html.Br(),
             html.Label("Weight", style={"margin": "5px"}, id="WEIGHT"),
-            dcc.Slider(
+            html.Br(),
+            dcc.Input(
                 id="weight",
-                min=20,
+                type = "number",
+                min=0,
                 max=200,
-                step=1,
+                # step=1,
                 value=70,
-                marks={10 * i: str(10 * i) for i in range(21)},
+                # marks={10 * i: str(10 * i) for i in range(21)},
             ),
+            
+            html.Br(),
+            html.Br(),
+            html.Br(),
+
+            html.Div(
+            html.H1("Select Drink"), style={'width': '32%', 'display': 'inline-block'}),
+
+            html.Div(
+                dcc.Dropdown(
+                    id="drink_inp",
+                    # placeholder="Enter Drink"
+                    options = alc_labels,
+                ), style={'width': '32%',"height":"100px",  "text-align": "center", "font-size":13}, id = "drop"),
+
         ], id="container"),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
+        
+        
         html.Div([
 
-            html.Div(
-                html.H1("Enter Drink"), style={'width': '32%', 'display': 'inline-block'}),
+
 
             html.Div(
-                html.H1("Enter Volume of that drink in mL"), style={'width': '32%', 'display': 'inline-block'}),
+                html.H1("Enter Volume of that drink in mL"), style={'width': '49%', 'display': 'inline-block'}),
             html.Div(
                 html.H1("Enter the time you drunk it"),
-                style={'width': '32%', 'display': 'inline-block'}),
+                style={'width': '49%', 'display': 'inline-block'}),
 
 
 
@@ -88,23 +128,21 @@ app.layout = html.Div(
 
         html.Div([
 
-            html.Div(
-                dcc.Input(
-                    id="drink_inp",
-                    placeholder="Enter Drink"
-                ), style={'width': '32%', 'display': 'inline-block', "text-align": "center", }),
 
             html.Div(
                 dcc.Input(
                     id="volume_inp",
-                    placeholder="Enter Enter Volume (mL)"
-                ), style={'width': '32%', 'display': 'inline-block', "text-align": "center"}),
+                    placeholder="Enter Volume (mL)",
+                    type = "number",
+                    min = 0,
+                ), style={'width': '49%', 'display': 'inline-block', "text-align": "center", "height": "30%"}),
             html.Div(
                 dcc.Input(
                     id="time_inp",
-                    placeholder="Enter Time"
+                    placeholder="Enter Time",
+                    
                 ),
-                style={'width': '32%', 'display': 'inline-block', "text-align": "center"}),
+                style={'width': '49%', 'display': 'inline-block', "text-align": "center"}),
 
 
 
@@ -112,7 +150,7 @@ app.layout = html.Div(
 
 
         html.Br(),
-        html.Button('Add Row', id='editing-rows-button', n_clicks=0),
+        html.Button('ADD DRINK', id='editing-rows-button', n_clicks=0),
         html.Br(),
         html.Div(id='output_div'),
 
@@ -158,15 +196,7 @@ app.layout = html.Div(
                     'textAlign': 'left'
                 }]
 
-
-
         ),
-
-
-
-
-
-
 
 
         dcc.Graph(
@@ -205,6 +235,27 @@ def add(c, d, v, t, og_data):
         print(test_df)
         return data
 
+@app.callback(
+    Output("output_div", "children"),
+    [Input('table', 'data_previous')],
+    [State('table', 'data')] 
+)
+def update(d0,d1):
+    if d1 != d0:
+        global test_df
+        ss = pd.DataFrame(d1, columns=["Drink", "Volume (mL)", "Time"])
+        test_df = ss
+    print(test_df)
+
+
+
+
+
+
+
+
+
+
 
 @app.callback(
     [Output(component_id="AGE", component_property="children"),
@@ -229,7 +280,7 @@ def update(age, height, weight):
 
     height_ft_inch = f"{floor(ft)}ft {round(float(number_dec)*12,1)}in"
 
-    height_txt = f"Height selected: {height} cm == {height_ft_inch}"
+    height_txt = f"Height selected: {height} cm = {height_ft_inch}"
     weight_txt = f"Weight: {weight}kg"
 
     figure = go.Figure(data=go.Scatter(
