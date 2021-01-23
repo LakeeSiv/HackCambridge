@@ -68,42 +68,58 @@ app.layout = html.Div(
                 marks={10 * i: str(10 * i) for i in range(21)},
             ),
         ], id="container"),
-
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
         html.Div([
 
             html.Div(
-                dcc.Input(
-                    id="drink_name",
-                    placeholder="Enter Drink"
-                ), style={'width': '32%', 'display': 'inline-block'}),
+                html.H1("Enter Drink"), style={'width': '32%', 'display': 'inline-block'}),
 
             html.Div(
-                dcc.Input(
-                    id="volume",
-                    placeholder="Enter Enter Volume (mL)"
-                ), style={'width': '32%', 'display': 'inline-block'}),
+                html.H1("Enter Volume of that drink in mL"), style={'width': '32%', 'display': 'inline-block'}),
             html.Div(
-                dcc.Input(
-                    id="time",
-                    placeholder="Enter Time"
-                ),
+                html.H1("Enter the time you drunk it"),
                 style={'width': '32%', 'display': 'inline-block'}),
 
 
 
         ]),
 
+        html.Div([
+
+            html.Div(
+                dcc.Input(
+                    id="drink_inp",
+                    placeholder="Enter Drink"
+                ), style={'width': '32%', 'display': 'inline-block', "text-align": "center", }),
+
+            html.Div(
+                dcc.Input(
+                    id="volume_inp",
+                    placeholder="Enter Enter Volume (mL)"
+                ), style={'width': '32%', 'display': 'inline-block', "text-align": "center"}),
+            html.Div(
+                dcc.Input(
+                    id="time_inp",
+                    placeholder="Enter Time"
+                ),
+                style={'width': '32%', 'display': 'inline-block', "text-align": "center"}),
+
+
+
+        ]),
+
+
         html.Br(),
-        dcc.Input(
-            id='adding-rows-name',
-            placeholder='Enter a column name...',
-            value='',
-            style={'padding': 10}
-        ),
-        html.Button('Add Column', id='adding-rows-button', n_clicks=0),
+        html.Button('Add Row', id='editing-rows-button', n_clicks=0),
+        html.Br(),
+        html.Div(id='output_div'),
+
         html.Br(),
         dash_table.DataTable(
-            id='adding-rows-table',
+            id='table',
             columns=[
 
                 {
@@ -147,7 +163,7 @@ app.layout = html.Div(
 
         ),
 
-        html.Button('Add Row', id='editing-rows-button', n_clicks=0),
+
 
 
 
@@ -169,14 +185,38 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output('adding-rows-table', 'data'),
+    # Output(component_id="output_div", component_property="children"),
+    Output("table", "data"),
     Input('editing-rows-button', 'n_clicks'),
-    State('adding-rows-table', 'data'),
-    State('adding-rows-table', 'columns'))
-def add_row(n_clicks, rows, columns):
-    if n_clicks > 0:
-        rows.append({c['id']: '' for c in columns})
-    return rows
+    State(component_id="drink_inp", component_property="value"),
+    State(component_id="volume_inp", component_property="value"),
+    State(component_id="time_inp", component_property="value"),
+
+)
+def add(c, d, v, t):
+    if c > 0:
+        # temp_df = pd.DataFrame([d, v, t], columns=["Drink", "Volume (mL)", "Time"])
+        # test_df.append(temp_df, ignore_index = True)
+        global test_df
+
+        test_df.loc[-1] = [d, v, t]
+        test_df.index = test_df.index + 1
+        test_df = test_df.sort_index()
+        data = test_df.to_dict("records")
+        return data
+
+
+# @app.callback(
+#     Output('adding-rows-table', 'data'),
+#     Input('editing-rows-button', 'n_clicks'),
+#     State('adding-rows-table', 'data'),
+#     State('adding-rows-table', 'columns'))
+# def add_row(n_clicks, rows, columns):
+#     if n_clicks > 0:
+
+
+#         # rows.append({c['id']: '' for c in columns})
+#     return rows
 
 
 @app.callback(
