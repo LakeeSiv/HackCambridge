@@ -12,7 +12,6 @@ server = app.server
 app.title = "Blood Alcohol Level"
 
 test_df = pd.read_excel("testdata.xlsx")
-# print(test_df.to_dict("records"))
 
 
 time = [f"{i}:00" for i in range(12)]
@@ -185,38 +184,26 @@ app.layout = html.Div(
 
 
 @app.callback(
-    # Output(component_id="output_div", component_property="children"),
     Output("table", "data"),
     Input('editing-rows-button', 'n_clicks'),
     State(component_id="drink_inp", component_property="value"),
     State(component_id="volume_inp", component_property="value"),
     State(component_id="time_inp", component_property="value"),
+    State(component_id="table", component_property="data")
 
 )
-def add(c, d, v, t):
+def add(c, d, v, t, og_data):
     if c > 0:
-        # temp_df = pd.DataFrame([d, v, t], columns=["Drink", "Volume (mL)", "Time"])
-        # test_df.append(temp_df, ignore_index = True)
         global test_df
+        ss = pd.DataFrame(og_data, columns=["Drink", "Volume (mL)", "Time"])
+        test_df = ss
 
         test_df.loc[-1] = [d, v, t]
         test_df.index = test_df.index + 1
         test_df = test_df.sort_index()
         data = test_df.to_dict("records")
+        print(test_df)
         return data
-
-
-# @app.callback(
-#     Output('adding-rows-table', 'data'),
-#     Input('editing-rows-button', 'n_clicks'),
-#     State('adding-rows-table', 'data'),
-#     State('adding-rows-table', 'columns'))
-# def add_row(n_clicks, rows, columns):
-#     if n_clicks > 0:
-
-
-#         # rows.append({c['id']: '' for c in columns})
-#     return rows
 
 
 @app.callback(
