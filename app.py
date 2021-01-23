@@ -11,7 +11,7 @@ app = dash.Dash(__name__)
 server = app.server
 app.title = "Blood Alcohol Level"
 
-test_df = pd.read_excel("testdata.xlsx")
+test_df = pd.DataFrame()
 
 alcohol_dictionary = {"Cider": 6, "Beer": 6, "Lager": 4, "Red Wine": 12.5, "White Wine": 11, "Vodka": 40, "Whiskey": 40, "Rum": 40}
 alc_labels = []
@@ -108,6 +108,23 @@ app.layout = html.Div(
                     # placeholder="Enter Drink"
                     options = alc_labels,
                 ), style={'width': '32%',"height":"100px",  "text-align": "center", "font-size":13}, id = "drop"),
+
+            
+
+            html.Div(
+            html.H1("Are you hungry?"), style={'width': '32%', 'display': 'inline-block'}),
+
+            html.Div(
+                dcc.Dropdown(
+                    id="hungry_inp",
+                    
+                    options = [
+                        {"label":"Yes","value":"Yes"},
+                        {"label":"No","value":"No"},
+                    ],
+                ), style={'width': '32%',"height":"100px",  "text-align": "center", "font-size":13}, id = "drop2"),
+
+
 
         ], id="container"),
         
