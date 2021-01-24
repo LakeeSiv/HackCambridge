@@ -261,6 +261,7 @@ app.layout = html.Div(
 @app.callback(
     Output("table", "data"),
     Input('editing-rows-button', 'n_clicks'),
+  
     State(component_id="drink_inp", component_property="value"),
     State(component_id="ABV_inp", component_property="value"),
     State(component_id="volume_inp", component_property="value"),
@@ -269,7 +270,7 @@ app.layout = html.Div(
 
 )
 def add(c, d, abv, v, t, og_data):
-    if c > 0 and abv is not None and v is not None and isTimeFormat(t) is True:
+    if (c > 0) and abv is not None and v is not None and isTimeFormat(t) is True:
 
         global test_df
         ss = pd.DataFrame(
@@ -294,9 +295,9 @@ def add(c, d, abv, v, t, og_data):
         df2 = df2[cols]
         global drinks_list
         df2["Time"] = pd.to_timedelta(df2.Time + ":00")
-        print(df2, "\n")
+        
         df2.sort_values(by="Time", ascending=True)
-        print(df2)
+        
 
         drinks_list = df2.values.tolist()
         drinks_list = sorted(drinks_list, key=itemgetter(1))
@@ -304,7 +305,7 @@ def add(c, d, abv, v, t, og_data):
         for i in drinks_list:
             i[1] = str(i[1])[7:12]
 
-        print(drinks_list)
+        
 
         return data
 
@@ -329,6 +330,24 @@ def update(d0, d1):
         global test_df
         ss = pd.DataFrame(d1, columns=["Drink", "ABV", "Volume (mL)", "Time"])
         test_df = ss
+        df2 = test_df.copy()
+        del df2["Drink"]
+        cols = list(df2.columns)
+        a, b = cols.index('Volume (mL)'), cols.index('Time')
+        cols[b], cols[a] = cols[a], cols[b]
+        df2 = df2[cols]
+        global drinks_list
+        df2["Time"] = pd.to_timedelta(df2.Time + ":00")
+        
+        df2.sort_values(by="Time", ascending=True)
+        
+
+        drinks_list = df2.values.tolist()
+        drinks_list = sorted(drinks_list, key=itemgetter(1))
+
+        for i in drinks_list:
+            i[1] = str(i[1])[7:12]
+
     print(test_df)
 
 
@@ -360,8 +379,9 @@ def update_ABV(drink):
 
 )
 def update(age, height, weight, sex, eaten, c):
+    
     age_txt = f"Age selected: {age} years"
-    print(sex, height, weight, age)
+    
     global user
     user = [sex, age, weight, height / 100, eaten]
     # r_value = r(sex, height/100,weight,age)
@@ -400,6 +420,12 @@ def update(age, height, weight, sex, eaten, c):
     figure.update_layout(
         plot_bgcolor="#1f1f1f",
         paper_bgcolor="#2c2c2c",
+        xaxis_title = "Time after first drink (hr)",
+        yaxis_title = "Blood Alcohol Level (g%)",
+        font=dict(
+            size=10,
+            color="white"
+        )
 
     )
 
