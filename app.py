@@ -94,9 +94,25 @@ app.layout = html.Div(
                 value=70,
                 # marks={10 * i: str(10 * i) for i in range(21)},
             ),
+            html.Br(),
+            html.Br(),
+            html.Div(
+            html.H1("Are you hungry?"), style={'width': '32%', 'display': 'inline-block'}),
+
+            html.Div(
+                dcc.Dropdown(
+                    id="hungry_inp",
+                    
+                    options = [
+                        {"label":"Yes","value":"Yes"},
+                        {"label":"No","value":"No"},
+                    ],
+                    value = "Yes",
+                    multi = False,
+                ), style={'width': '32%',"height":"100px",  "text-align": "center", "font-size":13}, id = "drop2"),
+
+
             
-            html.Br(),
-            html.Br(),
             html.Br(),
 
             html.Div(
@@ -111,20 +127,7 @@ app.layout = html.Div(
 
             
 
-            html.Div(
-            html.H1("Are you hungry?"), style={'width': '32%', 'display': 'inline-block'}),
-
-            html.Div(
-                dcc.Dropdown(
-                    id="hungry_inp",
-                    
-                    options = [
-                        {"label":"Yes","value":"Yes"},
-                        {"label":"No","value":"No"},
-                    ],
-                ), style={'width': '32%',"height":"100px",  "text-align": "center", "font-size":13}, id = "drop2"),
-
-
+           
 
         ], id="container"),
         
