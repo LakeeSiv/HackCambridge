@@ -118,7 +118,7 @@ app.layout = html.Div(
                 ), style={'width': '32%', "height": "100px", "text-align": "center", "font-size": 13}, id="drop2"),
 
 
-
+            html.Hr(),
             html.Br(),
 
             html.Div(
