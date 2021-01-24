@@ -6,6 +6,16 @@ import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
+from time import strptime
+
+
+def isTimeFormat(input):
+    try:
+        strptime(input, '%H:%M')
+        return True
+    except ValueError:
+        return False
+
 
 app = dash.Dash(__name__)
 server = app.server
@@ -13,16 +23,23 @@ app.title = "Blood Alcohol Level"
 
 test_df = pd.DataFrame()
 
-alcohol_dictionary = {"Cider": 6, "Beer": 6, "Lager": 4, "Red Wine": 12.5, "White Wine": 11, "Vodka": 40, "Whiskey": 40, "Rum": 40}
+alcohol_dictionary = {
+    "Custom": None,
+    "Cider": 6,
+    "Beer": 6,
+    "Lager": 4,
+    "Red Wine": 12.5,
+    "White Wine": 11,
+    "Vodka": 40,
+    "Whiskey": 40,
+    "Rum": 40}
 alc_labels = []
 
 for key, val in alcohol_dictionary.items():
     tempd = {}
-    tempd["label"] = key 
-    tempd["value"] = key 
+    tempd["label"] = key
+    tempd["value"] = key
     alc_labels.append(tempd)
-
-
 
 
 time = [f"{i}:00" for i in range(12)]
@@ -46,23 +63,14 @@ app.layout = html.Div(
                     "background": "black"}),
             html.Br(),
             html.Label("Select your age", style={"margin": "5px"}, id="AGE"),
-            # dcc.Slider(
-            #     id="age",
-            #     min=18,
-            #     max=60,
-            #     step=1,
-            #     value=18,
-            #     marks={2 * i: str(2 * i) for i in range(36)},
 
-
-            # ),
             html.Br(),
             dcc.Input(
-                id = "age",
-                type = "number",
-                min = 0,
-                max = 100,
-                value = 18,
+                id="age",
+                type="number",
+                min=0,
+                max=100,
+                value=18,
             ),
 
 
@@ -71,15 +79,14 @@ app.layout = html.Div(
             html.Br(),
             html.Label("Height", style={"margin": "5px"}, id="HEIGHT"),
             html.Br(),
-            
+
             dcc.Input(
                 id="height",
-                type = "number",
+                type="number",
                 min=0,
                 max=230,
-                # step=1,
                 value=170,
-        
+
             ),
             html.Br(),
             html.Br(),
@@ -87,86 +94,88 @@ app.layout = html.Div(
             html.Br(),
             dcc.Input(
                 id="weight",
-                type = "number",
+                type="number",
                 min=0,
                 max=200,
-                # step=1,
                 value=70,
-                # marks={10 * i: str(10 * i) for i in range(21)},
+
             ),
             html.Br(),
             html.Br(),
             html.Div(
-            html.H1("Are you hungry?"), style={'width': '32%', 'display': 'inline-block'}),
+                html.H1("Are you hungry?"), style={'width': '32%', 'display': 'inline-block'}),
 
             html.Div(
                 dcc.Dropdown(
                     id="hungry_inp",
-                    
-                    options = [
-                        {"label":"Yes","value":"Yes"},
-                        {"label":"No","value":"No"},
+
+                    options=[
+                        {"label": "Yes", "value": "Yes"},
+                        {"label": "No", "value": "No"},
                     ],
-                    value = "Yes",
-                    multi = False,
-                ), style={'width': '32%',"height":"100px",  "text-align": "center", "font-size":13}, id = "drop2"),
+                    value="Yes",
+                    multi=False,
+                ), style={'width': '32%', "height": "100px", "text-align": "center", "font-size": 13}, id="drop2"),
 
 
-            
+
             html.Br(),
 
             html.Div(
-            html.H1("Select Drink"), style={'width': '32%', 'display': 'inline-block'}),
+                html.H1("Select Drink"), style={'width': '32%', 'display': 'inline-block'}),
 
             html.Div(
                 dcc.Dropdown(
                     id="drink_inp",
-                    # placeholder="Enter Drink"
-                    options = alc_labels,
-                ), style={'width': '32%',"height":"100px",  "text-align": "center", "font-size":13}, id = "drop"),
+                    options=alc_labels,
+                    value="Custom",
+                ), style={'width': '32%', "height": "100px", "text-align": "center", "font-size": 13}, id="drop"),
 
-            
 
-           
+
+
 
         ], id="container"),
-        
-        
+
+
         html.Div([
-
-
+            html.Div(
+                html.H1("Enter the ABV of drink in % (if custom was selected)"), style={'width': '32%', 'display': 'inline-block'}),
 
             html.Div(
-                html.H1("Enter Volume of that drink in mL"), style={'width': '49%', 'display': 'inline-block'}),
+                html.H1("Enter Volume of that drink in mL"), style={'width': '32%', 'display': 'inline-block'}),
             html.Div(
-                html.H1("Enter the time you drunk it"),
-                style={'width': '49%', 'display': 'inline-block'}),
-
-
-
+                html.H1("Enter the time you drunk it (HH:MM)"),
+                style={'width': '32%', 'display': 'inline-block'}),
         ]),
 
         html.Div([
-
-
+            html.Div(
+                dcc.Input(
+                    id="ABV_inp",
+                    placeholder="Enter ABV if necessary",
+                    type="number",
+                    min=0,
+                    max=100,
+                ), style={'width': '32%', 'display': 'inline-block', "text-align": "center", "height": "30%"}),
             html.Div(
                 dcc.Input(
                     id="volume_inp",
                     placeholder="Enter Volume (mL)",
-                    type = "number",
-                    min = 0,
-                ), style={'width': '49%', 'display': 'inline-block', "text-align": "center", "height": "30%"}),
+                    type="number",
+                    min=0,
+                ), style={'width': '32%', 'display': 'inline-block', "text-align": "center", "height": "30%"}),
             html.Div(
                 dcc.Input(
                     id="time_inp",
                     placeholder="Enter Time",
-                    
+
                 ),
-                style={'width': '49%', 'display': 'inline-block', "text-align": "center"}),
+                style={'width': '32%', 'display': 'inline-block', "text-align": "center"}),
 
 
 
-        ], id = "vol_time_inp"),
+        ], id="vol_time_inp"),
 
 
         html.Br(),
@@ -185,6 +194,12 @@ app.layout = html.Div(
                     'deletable': False,
                     'renamable': False
                 },
+                {
+                    'name': "ABV (%)",
+                    'id': "ABV",
+                    'deletable': False,
+                    'renamable': False
+                },
 
                 {
                     'name': "Volume (mL)",
@@ -192,6 +207,7 @@ app.layout = html.Div(
                     'deletable': False,
                     'renamable': False
                 },
+
                 {
                     'name': "Time",
                     'id': "Time",
@@ -226,8 +242,6 @@ app.layout = html.Div(
 
         ),
 
-
-
     ], id="data",
 
 )
@@ -237,44 +251,63 @@ app.layout = html.Div(
     Output("table", "data"),
     Input('editing-rows-button', 'n_clicks'),
     State(component_id="drink_inp", component_property="value"),
+    State(component_id="ABV_inp", component_property="value"),
     State(component_id="volume_inp", component_property="value"),
     State(component_id="time_inp", component_property="value"),
     State(component_id="table", component_property="data")
 
 )
-def add(c, d, v, t, og_data):
-    if c > 0:
+def add(c, d, abv, v, t, og_data):
+    if c > 0 and abv is not None and v is not None and isTimeFormat(t) is True:
+
         global test_df
-        ss = pd.DataFrame(og_data, columns=["Drink", "Volume (mL)", "Time"])
+        ss = pd.DataFrame(
+            og_data,
+            columns=[
+                "Drink",
+                "ABV",
+                "Volume (mL)",
+                "Time"])
         test_df = ss
 
-        test_df.loc[-1] = [d, v, t]
+        test_df.loc[-1] = [d, abv, v, t]
         test_df.index = test_df.index + 1
         test_df = test_df.sort_index()
         data = test_df.to_dict("records")
         print(test_df)
         return data
 
+    if abv is None or isTimeFormat(t) is False or v is None:
+        ss = pd.DataFrame(
+            og_data,
+            columns=[
+                "Drink",
+                "ABV",
+                "Volume (mL)",
+                "Time"])
+        return ss.to_dict("records")
+
+
 @app.callback(
     Output("output_div", "children"),
     [Input('table', 'data_previous')],
-    [State('table', 'data')] 
+    [State('table', 'data')]
 )
-def update(d0,d1):
+def update(d0, d1):
     if d1 != d0:
         global test_df
-        ss = pd.DataFrame(d1, columns=["Drink", "Volume (mL)", "Time"])
+        ss = pd.DataFrame(d1, columns=["Drink", "ABV", "Volume (mL)", "Time"])
         test_df = ss
     print(test_df)
 
 
-
-
-
-
-
-
-
+@app.callback(
+    Output("ABV_inp", "value"),
+    Input("drink_inp", "value"),
+)
+def update_ABV(drink):
+    if drink != "Custom" and drink is not None:
+        return alcohol_dictionary[drink]
 
 
 @app.callback(
