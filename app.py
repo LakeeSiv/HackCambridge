@@ -19,7 +19,7 @@ def isTimeFormat(input):
 
 app = dash.Dash(__name__)
 server = app.server
-app.title = "Blood Alcohol Level"
+app.title = "EtOH"
 
 test_df = pd.DataFrame()
 
@@ -48,7 +48,7 @@ z = [i**2 for i in range(12)]
 app.layout = html.Div(
     [
         html.Div([
-            html.H1("Blood Alcohol Predictor"),
+            html.H1("EtOH - The Blood Alcohol Level Predictor"),
 
             html.Label("Select your sex", style={"margin": "5px"}),
             html.Br(),
@@ -277,7 +277,7 @@ def add(c, d, abv, v, t, og_data):
         print(test_df)
         return data
 
-    if abv is None or isTimeFormat(t) is False or v is None:
+    if abv is None or t is None or isTimeFormat(t) is False or v is None:
         ss = pd.DataFrame(
             og_data,
             columns=[
