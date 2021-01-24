@@ -7,10 +7,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from time import strptime
-from calculations import r,alcohol_ingested,main_calculate
+from calculations import r, alcohol_ingested, main_calculate
 import numpy as np
+from operator import itemgetter
 empty_stomach_half_life_hour = 0.1066
 full_stomach_half_life_hour = 0.3009
+
 
 def isTimeFormat(input):
     try:
@@ -239,7 +241,7 @@ app.layout = html.Div(
         html.Br(),
         html.Br(),
 
-        
+
         html.Button('Update Graph', id='update_graph', n_clicks=0),
 
 
@@ -291,9 +293,18 @@ def add(c, d, abv, v, t, og_data):
         cols[b], cols[a] = cols[a], cols[b]
         df2 = df2[cols]
         global drinks_list
-        drinks_list = df2.values.tolist()  
+        df2["Time"] = pd.to_timedelta(df2.Time + ":00")
+        print(df2, "\n")
+        df2.sort_values(by="Time", ascending=True)
+        print(df2)
+
+        drinks_list = df2.values.tolist()
+        drinks_list = sorted(drinks_list, key=itemgetter(1))
+
+        for i in drinks_list:
+            i[1] = str(i[1])[7:12]
+
         print(drinks_list)
-        
 
         return data
 
@@ -306,8 +317,6 @@ def add(c, d, abv, v, t, og_data):
                 "Volume (mL)",
                 "Time"])
         return ss.to_dict("records")
-
-
 
 
 @app.callback(
@@ -350,11 +359,11 @@ def update_ABV(drink):
      ]
 
 )
-def update(age, height, weight, sex, eaten,c):
+def update(age, height, weight, sex, eaten, c):
     age_txt = f"Age selected: {age} years"
-    print(sex,height,weight,age)
-    global user 
-    user = [sex,age,weight,height/100,eaten]
+    print(sex, height, weight, age)
+    global user
+    user = [sex, age, weight, height / 100, eaten]
     # r_value = r(sex, height/100,weight,age)
     print(user)
 
@@ -367,24 +376,20 @@ def update(age, height, weight, sex, eaten,c):
     weight_txt = f"Weight: {weight}kg"
 
     figure = go.Figure(data=go.Scatter(
-            x=[0],
-            y=[0],
+        x=[0],
+        y=[0],
     ))
 
-    if c>0:
-        t,c = main_calculate(user,drinks_list)
+    if c > 0:
+        t, c = main_calculate(user, drinks_list)
         figure = go.Figure(data=go.Scatter(
-            x=t,
+            x=t / 3600,
             y=c,
 
         ))
 
-        
-
-
-
     figure.update_traces(line_color="white", textfont_color="white", selector=dict(type='scatter'), marker_colorbar_tickcolor="white"
-                        )
+                         )
 
     figure.update_xaxes(showgrid=False, zeroline=False, tickcolor='white',
                         tickfont=dict(color='white'))
