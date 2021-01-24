@@ -7,7 +7,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from time import strptime
-
+from calculations import r,alcohol_ingested,main_calculate
+import numpy as np
+empty_stomach_half_life_hour = 0.1066
+full_stomach_half_life_hour = 0.3009
 
 def isTimeFormat(input):
     try:
@@ -56,10 +59,10 @@ app.layout = html.Div(
             dcc.Dropdown(
                 id="sex", options=[
                     {
-                        "label": "Male", "value": "Male"}, {
-                        "label": "Female", "value": "Female"},
+                        "label": "Male", "value": "male"}, {
+                        "label": "Female", "value": "female"},
 
-                ], multi=False, value="ALL", style={
+                ], multi=False, value="male", style={
                     "background": "black"}),
             html.Br(),
             html.Label("Select your age", style={"margin": "5px"}, id="AGE"),
@@ -103,7 +106,7 @@ app.layout = html.Div(
             html.Br(),
             html.Br(),
             html.Div(
-                html.H1("Are you hungry?"), style={'width': '32%', 'display': 'inline-block'}),
+                html.H1("Have you eaten?"), style={'width': '32%', 'display': 'inline-block'}),
 
             html.Div(
                 dcc.Dropdown(
@@ -233,6 +236,12 @@ app.layout = html.Div(
                 }]
 
         ),
+        html.Br(),
+        html.Br(),
+
+        
+        html.Button('Update Graph', id='update_graph', n_clicks=0),
+
 
 
         dcc.Graph(
@@ -274,7 +283,18 @@ def add(c, d, abv, v, t, og_data):
         test_df.index = test_df.index + 1
         test_df = test_df.sort_index()
         data = test_df.to_dict("records")
-        print(test_df)
+        # print(test_df)
+        df2 = test_df.copy()
+        del df2["Drink"]
+        cols = list(df2.columns)
+        a, b = cols.index('Volume (mL)'), cols.index('Time')
+        cols[b], cols[a] = cols[a], cols[b]
+        df2 = df2[cols]
+        global drinks_list
+        drinks_list = df2.values.tolist()  
+        print(drinks_list)
+        
+
         return data
 
     if abv is None or t is None or isTimeFormat(t) is False or v is None:
@@ -286,6 +306,8 @@ def add(c, d, abv, v, t, og_data):
                 "Volume (mL)",
                 "Time"])
         return ss.to_dict("records")
+
+
 
 
 @app.callback(
@@ -320,13 +342,21 @@ def update_ABV(drink):
     [Input(component_id="age", component_property="value"),
      Input(component_id="height", component_property="value"),
      Input(component_id="weight", component_property="value"),
+     Input(component_id="sex", component_property="value"),
+     Input(component_id="hungry_inp", component_property="value"),
+     Input(component_id="update_graph", component_property="n_clicks"),
 
 
      ]
 
 )
-def update(age, height, weight):
+def update(age, height, weight, sex, eaten,c):
     age_txt = f"Age selected: {age} years"
+    print(sex,height,weight,age)
+    global user 
+    user = [sex,age,weight,height/100,eaten]
+    # r_value = r(sex, height/100,weight,age)
+    print(user)
 
     ft = 0.0328 * height
     number_dec = str(ft - int(ft))[1:]
@@ -337,13 +367,24 @@ def update(age, height, weight):
     weight_txt = f"Weight: {weight}kg"
 
     figure = go.Figure(data=go.Scatter(
-        x=time,
-        y=z,
-
+            x=[0],
+            y=[0],
     ))
 
+    if c>0:
+        t,c = main_calculate(user,drinks_list)
+        figure = go.Figure(data=go.Scatter(
+            x=t,
+            y=c,
+
+        ))
+
+        
+
+
+
     figure.update_traces(line_color="white", textfont_color="white", selector=dict(type='scatter'), marker_colorbar_tickcolor="white"
-                         )
+                        )
 
     figure.update_xaxes(showgrid=False, zeroline=False, tickcolor='white',
                         tickfont=dict(color='white'))
