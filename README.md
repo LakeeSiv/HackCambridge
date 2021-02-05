@@ -1,4 +1,4 @@
-# HackCambridge 2021 - EtOH
+# HackCambridge (Hex Cambridge) 2021 - EtOH
 
 [EtOH](https://etoh.herokuapp.com/) is a website which allows you to predict your blood alcohol levels over time.
 
